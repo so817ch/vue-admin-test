@@ -40,8 +40,14 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+        
+      <div>
+        <el-button :loading="loginLoading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      </div>
+      
+      <div>
+        <el-button :loading="signUpLoading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleSignUp">Sign up</el-button>
+      </div>
 
       <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -59,11 +65,12 @@ export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
+      // if (!validUsername(value)) {
+      //   callback(new Error('Please enter the correct user name'))
+      // } else {
+      //   callback()
+      // }
+      callback();
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
@@ -81,7 +88,8 @@ export default {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
-      loading: false,
+      loginLoading: false,
+      signUpLoading: false,
       passwordType: 'password',
       redirect: undefined
     }
@@ -95,6 +103,9 @@ export default {
     }
   },
   methods: {
+    handleSignUp() {
+      this.$router.push("/signup")
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -108,12 +119,12 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
+          this.loginLoading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
+            this.loginLoading = false
           }).catch(() => {
-            this.loading = false
+            this.loginLoading = false
           })
         } else {
           console.log('error submit!!')
