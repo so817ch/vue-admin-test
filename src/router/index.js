@@ -32,6 +32,17 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
+    path: '/redirect',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/redirect/:path(.*)',
+        component: () => import('@/views/redirect/index')
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
@@ -40,12 +51,6 @@ export const constantRoutes = [
   {
     path: '/signup',
     component: () => import('@/views/signup/index'),
-    hidden: true
-  },
-
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
     hidden: true
   },
 
@@ -64,6 +69,8 @@ export const constantRoutes = [
   {
     path: '/test',
     component: Layout,
+    alwaysShow: true,
+    meta: { title: '提交表格', icon: 'form' },
     children: [
       {
         path: 'index',
@@ -179,23 +186,28 @@ export const constantRoutes = [
   //   ]
   // },
 
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
 ]
 
-export const asyncRouterMap = [
+export const asyncRoutes = [
   {
     path: '/permission',
     component: Layout,
-    name: '权限测试',
-    meta: { role: ['admin', 'editor'] }, //页面需要的权限
+    name: 'permission',
+    alwaysShow: true,
+    meta: { roles: ['admin'], title: '权限', icon: 'form' }, //页面需要的权限
     children: [
       {
         path: 'index',
-        component: () => import('@/views/test/index'),
+        component: () => import('@/views/table/index'),
         name: '权限测试页',
-        meta: { role: ['admin', 'editor'] }  //页面需要的权限
+        meta: { roles: ['admin'], title: '测试', icon: 'form' }  //页面需要的权限
       }]
+  },
+
+  {
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true
   },
 
   // 404 page must be placed at the end !!!

@@ -30,6 +30,9 @@ export default {
       fileList: [],
     };
   },
+  created() {
+    console.log(this.$store.getters.permission_routes);
+  },
   methods: {
     submitUpload() {
       this.$refs.upload.submit();
