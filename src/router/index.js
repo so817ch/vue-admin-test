@@ -183,6 +183,26 @@ export const constantRoutes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
+export const asyncRouterMap = [
+  {
+    path: '/permission',
+    component: Layout,
+    name: '权限测试',
+    meta: { role: ['admin', 'editor'] }, //页面需要的权限
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/test/index'),
+        name: '权限测试页',
+        meta: { role: ['admin', 'editor'] }  //页面需要的权限
+      }]
+  },
+
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true }
+
+];
+
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
