@@ -12,15 +12,15 @@
         <h3 class="title">Sign Up Form</h3>
       </div>
 
-      <el-form-item prop="username" class="input">
+      <el-form-item prop="userName" class="input">
         <span class="svg-container">
           <font-awesome-icon icon="fa-solid fa-user" />
         </span>
         <el-input
-          ref="username"
-          v-model="signUpForm.username"
+          ref="userName"
+          v-model="signUpForm.userName"
           placeholder="用户名"
-          name="username"
+          name="userName"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -71,29 +71,44 @@
         </span>
       </el-form-item>
 
-      <el-form-item prop="email" class="input">
+      <el-form-item prop="name" class="input">
         <span class="svg-container">
-          <font-awesome-icon icon="fa-solid fa-envelope" />
+          <font-awesome-icon icon="fa-solid fa-id-card" />
         </span>
         <el-input
-          ref="email"
-          v-model="signUpForm.email"
-          placeholder="Email"
-          name="email"
-          type="email"
+          ref="name"
+          v-model="signUpForm.name"
+          placeholder="真实姓名"
+          name="name"
+          type="text"
           tabindex="1"
           auto-complete="on"
         />
       </el-form-item>
 
-      <el-form-item prop="school">
+      <el-form-item prop="tel" class="input">
+        <span class="svg-container">
+          <font-awesome-icon icon="fa-solid fa-phone" />
+        </span>
+        <el-input
+          ref="tel"
+          v-model="signUpForm.tel"
+          placeholder="联系电话"
+          name="tel"
+          type="tel"
+          tabindex="1"
+          auto-complete="on"
+        />
+      </el-form-item>
+
+      <el-form-item prop="schId">
         <div class="select">
           <span class="svg-container">
             <font-awesome-icon icon="fa-solid fa-school" />
           </span>
           <el-select
-            v-model="signUpForm.school"
-            placeholder="学校"
+            v-model="signUpForm.schId"
+            placeholder="输入以选择学校"
             clearable
             filterable
             name="school"
@@ -103,14 +118,42 @@
               v-for="item in schoolData"
               :key="item.id"
               :label="item.name"
-              :value="item.name"
+              :value="item.id"
             >
             </el-option>
           </el-select>
         </div>
       </el-form-item>
 
-      
+      <el-form-item prop="gender">
+        <div class="select">
+          <span class="svg-container">
+            <font-awesome-icon icon="fa-solid fa-venus-mars" />
+          </span>
+          <el-select
+            v-model="signUpForm.gender"
+            placeholder="性别"
+            clearable
+            name="gender"
+            ref="gender"
+          >
+            <el-option
+              v-for="item in genderData"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            >
+              <template>
+                <font-awesome-icon
+                  style="margin-right: 12px"
+                  :icon="item.icon"
+                />
+                <span>{{ item.name }}</span>
+              </template>
+            </el-option>
+          </el-select>
+        </div>
+      </el-form-item>
 
       <div>
         <el-button
@@ -118,7 +161,7 @@
           type="primary"
           style="width: 100%; margin-bottom: 30px"
           @click.native.prevent="handleSignUp"
-          >Sign up</el-button
+          >注册</el-button
         >
       </div>
 
@@ -128,7 +171,7 @@
           type="primary"
           style="width: 100%; margin-bottom: 30px"
           @click.native.prevent="handleBack"
-          >Back</el-button
+          >返回登录</el-button
         >
       </div>
 
@@ -141,7 +184,13 @@
 </template>
 
 <script>
-import { validUsername,validEmail, validPassword } from "@/utils/validate";
+import { register } from "@/api/user";
+import {
+  validUsername,
+  validEmail,
+  validPassword,
+  validTel,
+} from "@/utils/validate";
 
 export default {
   name: "SignUp",
@@ -167,28 +216,41 @@ export default {
         callback();
       }
     };
-    const validateEmail = (rule, value, callback)=>{
+    const validateEmail = (rule, value, callback) => {
       if (!validEmail(value)) {
         callback(new Error("请输入正确格式的邮箱"));
       } else {
         callback();
       }
     };
+    const validateTel = (rule, value, callback) => {
+      if (!validTel(value)) {
+        callback(new Error("请输入正确格式的联系电话"));
+      } else {
+        callback();
+      }
+    };
     return {
+      genderData: [
+        { id: 1, name: "男", icon: "fa-solid fa-mars" },
+        { id: 2, name: "女", icon: "fa-solid fa-venus" },
+      ],
       schoolData: [
         { id: 1, name: "中国石油大学（华东）" },
         { id: 2, name: "中国石油大学（北京）" },
       ],
       signUpForm: {
-        username: "",
+        userName: "",
         password: "",
         passwordCheck: "",
-        email: "",
-        school: "",
+        name: "",
+        tel: "",
+        schId: null,
+        gender: null,
       },
 
       signUpRules: {
-        username: [
+        userName: [
           { required: true, trigger: "blur", validator: validateUsername },
         ],
         password: [
@@ -197,14 +259,22 @@ export default {
         passwordCheck: [
           { required: true, trigger: "blur", validator: validatePasswordCheck },
         ],
-        email: [
-          { required: true, trigger: "blur", validator: validateEmail },
+        tel: [{ required: true, trigger: "blur", validator: validateTel }],
+        name: [
+          { required: true, trigger: "blur", message: "请输入你的真实姓名" },
         ],
-        school: [
+        schId: [
           {
             required: true,
             trigger: "change",
-            message: "请先选择一个学校",
+            message: "请选择一个学校",
+          },
+        ],
+        gender: [
+          {
+            required: true,
+            trigger: "change",
+            message: "请选择你的性别",
           },
         ],
       },
@@ -213,6 +283,12 @@ export default {
       passwordCheckType: "password",
       redirect: undefined,
     };
+  },
+  computed: {
+    registerForm() {
+      let { passwordCheck, ...res } = this.signUpForm;
+      return res;
+    },
   },
   watch: {
     $route: {
@@ -224,10 +300,28 @@ export default {
   },
   methods: {
     handleBack() {
-      this.$router.push("/login")
+      this.$router.push("/login");
     },
     handleSignUp() {
-      console.log(this.signUpForm);
+      this.$refs.signUpForm.validate((valid) => {
+        if (valid) {
+          console.log(this.registerForm);
+          register(this.registerForm).then((response) => {
+            this.$message({
+              message: "恭喜你，这是一条成功消息",
+              type: "success",
+            });
+            console.log(response);
+          }).catch((error) => {
+            this.$message.error('错了哦，这是一条后端返回错误消息');
+            console.log(error);
+          });
+        } else {
+          this.$message.error('错了哦，这是一条表单校验错误消息');
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
     showPwd(type) {
       if (!type) {
@@ -331,7 +425,7 @@ $light_gray: #eee;
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 100px;
+    padding: 100px 35px 100px;
     margin: 0 auto;
     overflow: hidden;
   }

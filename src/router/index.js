@@ -62,7 +62,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '教学概况', icon: 'fa-solid fa-gauge' }
     }]
   },
 
@@ -70,13 +70,20 @@ export const constantRoutes = [
     path: '/test',
     component: Layout,
     alwaysShow: true,
-    meta: { title: '提交表格', icon: 'form' },
+    meta: { title: '题目评分', icon: 'fa-solid fa-table' },
     children: [
       {
         path: 'index',
         name: 'test',
-        component: () => import('@/views/test/index'),
-        meta: { title: '测试', icon: 'form' }
+        component: () => import('@/views/test/history'),
+        meta: { title: '历史评分', icon: 'fa-solid fa-clock' }
+      },
+
+      {
+        path: 'upload',
+        name: 'upload',
+        component: () => import('@/views/test/upload'),
+        meta: { title: '上传题目', icon: 'fa-solid fa-cloud-arrow-up' }
       }
     ]
   },
@@ -194,13 +201,28 @@ export const asyncRoutes = [
     component: Layout,
     name: 'permission',
     alwaysShow: true,
-    meta: { roles: ['admin'], title: '权限', icon: 'form' }, //页面需要的权限
+    meta: { roles: ['admin'], title: '权限', icon: 'fa-solid fa-check' }, //页面需要的权限
     children: [
       {
         path: 'index',
         component: () => import('@/views/table/index'),
         name: '权限测试页',
-        meta: { roles: ['admin'], title: '测试', icon: 'form' }  //页面需要的权限
+        meta: { roles: ['admin'], title: '测试', icon: 'fa-solid fa-file' }  //页面需要的权限
+      }]
+  },
+
+  {
+    path: '/teacher',
+    component: Layout,
+    name: 'teacher',
+    alwaysShow: true,
+    meta: { roles: ['admin'], title: '教师管理', icon: 'fa-solid fa-chalkboard-user' }, //页面需要的权限
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/teacher/index'),
+        name: '权限测试页',
+        meta: { roles: ['admin'], title: '教师名单', icon: 'fa-solid fa-list' }  //页面需要的权限
       }]
   },
 

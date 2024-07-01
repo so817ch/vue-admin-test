@@ -37,3 +37,9 @@ export function validEmail(email) {
   const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   return regex.test(email);
 }
+
+export function validTel(phoneNumber) {
+  // 正则表达式匹配中国大陆的合法手机号码
+  const regex = /^(?:\+86)?1[3-9]\d{9}$/;
+  return regex.test(phoneNumber);
+}
