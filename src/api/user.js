@@ -4,15 +4,15 @@ export function login(data) {
   return request({
     url: '/user/login',
     method: 'post',
-    data
+    data:data
   })
 }
 
 export function getInfo(token) {
   return request({
-    url: '/user/info',
+    url: `/user/info/${token}`,
     method: 'get',
-    params: { token }
+    // params: { token }
   })
 }
 
@@ -30,3 +30,12 @@ export function register(form) {
     data:form
   })
 }
+
+export function getTeacherPage(pageForm) {
+  return request({
+    url: '/user/page',
+    method: 'post',
+    data: pageForm
+  })
+}
+

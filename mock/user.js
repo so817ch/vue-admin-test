@@ -29,8 +29,8 @@ module.exports = [
     url: '/user/login',
     type: 'post',
     response: config => {
-      const { username } = config.body
-      const token = tokens[username]
+      const { userName } = config.body
+      const token = tokens[userName]
 
       // mock error
       if (!token) {
@@ -52,7 +52,8 @@ module.exports = [
     url: '/user/info\.*',
     type: 'get',
     response: config => {
-      const { token } = config.query
+      const token = config.url.split('/').pop();
+      console.log(token);
       const info = users[token]
 
       // mock error

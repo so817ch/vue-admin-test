@@ -6,15 +6,15 @@
         <h3 class="title">Login Form</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="userName">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="userName"
+          v-model="loginForm.userName"
+          placeholder="用户名"
+          name="userName"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="密码"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -50,7 +50,7 @@
       </div>
 
       <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
+        <span style="margin-right:20px;">userName: admin</span>
         <span> password: any</span>
       </div>
 
@@ -59,33 +59,32 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+import { validUserName } from '@/utils/validate'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      // if (!validUsername(value)) {
-      //   callback(new Error('Please enter the correct user name'))
+    const validateUserName = (rule, value, callback) => {
+      // if (!validUserName(value)) {
+      //   callback(new Error("用户名只能由数字，英文字母和“_”、”-“字符组成"));
       // } else {
-      //   callback()
+        callback();
       // }
-      callback();
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
+      // if (value.length < 6) {
+      //   callback(new Error('The password can not be less than 6 digits'))
+      // } else {
         callback()
-      }
+      // }
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        userName: '',
+        password: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        userName: [{ required: true, trigger: 'blur', validator:validateUserName }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loginLoading: false,
@@ -119,6 +118,7 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          console.log(this.loginForm);
           this.loginLoading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })

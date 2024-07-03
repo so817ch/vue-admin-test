@@ -184,9 +184,10 @@
 </template>
 
 <script>
+import { getAllSchool } from "@/api/school";
 import { register } from "@/api/user";
 import {
-  validUsername,
+  validUserName,
   validEmail,
   validPassword,
   validTel,
@@ -195,8 +196,8 @@ import {
 export default {
   name: "SignUp",
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+    const validateUserName = (rule, value, callback) => {
+      if (!validUserName(value)) {
         callback(new Error("用户名只能由数字，英文字母和“_”、”-“字符组成"));
       } else {
         callback();
@@ -251,7 +252,7 @@ export default {
 
       signUpRules: {
         userName: [
-          { required: true, trigger: "blur", validator: validateUsername },
+          { required: true, trigger: "blur", validator: validateUserName },
         ],
         password: [
           { required: true, trigger: "blur", validator: validatePassword },
@@ -283,6 +284,18 @@ export default {
       passwordCheckType: "password",
       redirect: undefined,
     };
+  },
+  created: function () {
+    getAllSchool().then((response) => {
+      console.log(response);
+      const { data } = response;
+      this.schoolData = data;
+    }).catch((error) => {
+      this.$message({
+        message: '没有获取到学校信息:'+error,
+        type: 'error'
+      });
+    })
   },
   computed: {
     registerForm() {
