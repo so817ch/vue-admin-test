@@ -227,6 +227,36 @@ export const asyncRoutes = [
   },
 
   {
+    path: '/school',
+    component: Layout,
+    name: 'school',
+    alwaysShow: true,
+    meta: { roles: ['admin'], title: '学校管理', icon: 'fa-solid fa-school' }, //页面需要的权限
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/school/index'),
+        name: '权限测试页',
+        meta: { roles: ['admin'], title: '学校列表', icon: 'fa-solid fa-list' }  //页面需要的权限
+      }]
+  },
+
+  {
+    path: '/subject',
+    component: Layout,
+    name: 'subject',
+    alwaysShow: true,
+    meta: { roles: ['admin'], title: '科目管理', icon: 'fa-solid fa-book' }, //页面需要的权限
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/subject/index'),
+        name: '权限测试页',
+        meta: { roles: ['admin'], title: '科目列表', icon: 'fa-solid fa-list' }  //页面需要的权限
+      }]
+  },
+
+  {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true

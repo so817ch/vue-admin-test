@@ -14,8 +14,8 @@ export function isExternal(path) {
  * @param {string} str
  * @returns {Boolean}
  */
-export function validUsername(username) {
-  const regex = /^[a-zA-Z0-9_-]{6,30}$/;
+export function validUserName(username) {
+  const regex = /^[a-zA-Z0-9_-]{5,30}$/;
   return regex.test(username);
 }
 
