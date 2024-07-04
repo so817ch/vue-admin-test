@@ -41,7 +41,7 @@ export function getTeacherPage(pageForm) {
 
 export function deleteTeacher(ids) {
   return request({
-    url: `/user/info/${ids.join(',')}`,
+    url: `/user/delete/${ids.join(',')}`,
     method: 'delete',
     // params: { token }
   })

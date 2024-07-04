@@ -1,23 +1,102 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
-      <el-form-item label="审批人">
-        <el-input v-model="formInline.user" placeholder="审批人"></el-input>
+      <el-form-item label="ID号">
+        <el-input v-model="formInline.id" placeholder="ID号"></el-input>
       </el-form-item>
-      <el-form-item label="活动区域">
-        <el-select v-model="formInline.region" placeholder="活动区域">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
+      <el-form-item label="姓名">
+        <el-input v-model="formInline.name" placeholder="姓名"></el-input>
+      </el-form-item>
+      <el-form-item label="学校">
+        <el-select
+          v-model="formInline.schId"
+          placeholder="输入以选择学校"
+          clearable
+          filterable
+          name="school"
+          ref="school"
+        >
+          <el-option
+            v-for="item in schoolData"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+      <el-form-item label="状态">
+        <el-select
+          v-model="formInline.status"
+          placeholder="选择状态"
+          clearable
+          filterable
+          name="school"
+          ref="school"
+        >
+          <el-option
+            v-for="item in status"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
+        </el-select>
       </el-form-item>
     </el-form>
+
+    <el-row type="flex" justify="end">
+      <el-button
+        class="menu-button"
+        type="primary"
+        @click="colg(multipleSelection)"
+      >
+        <template>
+          <font-awesome-icon
+            class="button-icon"
+            icon="fa-solid fa-magnifying-glass"
+          />
+          <span>查询</span>
+        </template>
+      </el-button>
+
+      <el-button class="menu-button" type="success"
+        ><template>
+          <font-awesome-icon class="button-icon" icon="fa-solid fa-plus" />
+          <span>新增用户</span>
+        </template></el-button
+      >
+
+      <el-button class="menu-button" type="warning"
+        ><template>
+          <font-awesome-icon
+            class="button-icon"
+            icon="fa-solid fa-square-check"
+          />
+          <span>全部选择</span>
+        </template></el-button
+      >
+
+      <el-button class="menu-button" type="warning" @click="handleUnCheckAll"
+        ><template>
+          <font-awesome-icon
+            class="button-icon"
+            icon="fa-solid fa-square-xmark"
+          />
+          <span>全部取消</span>
+        </template></el-button
+      >
+
+      <el-button class="menu-button" type="danger" @click="handleBatchDelete"
+        ><template>
+          <font-awesome-icon class="button-icon" icon="fa-solid fa-trash-can" />
+          <span>批量删除</span>
+        </template></el-button
+      >
+    </el-row>
 
     <el-table
       :data="tableData"
       stripe=""
+      height="500"
       border
       style="width: 100%"
       @select="handleSelection"
@@ -45,6 +124,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="联系电话" align="center">
+        <template v-slot="scope">
+          <span>{{ scope.row.tel }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="学校" header-align="center">
         <template v-slot="scope">
           <span>{{ getSchoolName(scope.row.schId) }}</span>
@@ -54,53 +139,88 @@
       <el-table-column label="状态" width="80" align="center">
         <template v-slot="scope">
           <el-tag :type="scope.row.status ? 'danger' : 'success'">
-            {{ scope.row.status ? "异常" : "正常" }}
+            {{ status.find((item) => item.id === scope.row.status).name }}
           </el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="250" header-align="center">
+      <el-table-column label="注册时间" align="center">
+        <template v-slot="scope">
+          <span>{{ scope.row.createTime }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" width="200" header-align="center">
         <template v-slot="scope">
           <!-- 点击按钮时，将id传入方法 -->
           <el-button size="mini" @click="handleInfo(scope.row.id)"
-            >编辑</el-button
+            ><template>
+              <font-awesome-icon
+                class="button-icon"
+                icon="fa-solid fa-circle-info"
+              />
+              <span>编辑</span>
+            </template></el-button
           >
-          <el-button
-            type="danger"
-            circle
-            size="mini"
-            @click="handleDelete(scope.row.id)"
-          >
-            <div class="icon-container">
-              <font-awesome-icon icon="fa-solid fa-trash-can" />
-            </div>
-          </el-button>
+
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row.id)"
-            >删除</el-button
+            @click="handleDelete(scope.row.id, scope.row.name)"
+            ><template>
+              <font-awesome-icon
+                class="button-icon"
+                icon="fa-solid fa-trash-can"
+              />
+              <span>删除</span>
+            </template></el-button
           >
         </template>
       </el-table-column>
     </el-table>
 
-    <el-pagination
-      @current-change="changePage"
-      :current-page="pageForm.page"
-      v-if="isShow"
-      background
-      layout="prev, pager, next"
-      :total="total"
-      :page-size="pageForm.pageSize"
+    <el-row
+      type="flex"
+      justify="start"
+      style="margin-top: 10px; margin-bottom: 10px"
+      align="middle"
     >
-    </el-pagination>
+      <div style="margin-right: 10px; color: #606266; font-size: 13px">
+        已选中{{ multipleSelection.length }}/{{ total }}条
+      </div>
+      <el-select
+        v-model="pageForm.pageSize"
+        placeholder="请选择"
+        size="mini"
+        style="margin-right: 10px; width: 100px"
+        @change="changePage(1)"
+      >
+        <el-option
+          v-for="item in pageOption"
+          :key="item.id"
+          :label="`${item.pageSize} 条/页`"
+          :value="item.pageSize"
+        >
+        </el-option>
+      </el-select>
+
+      <el-pagination
+        @current-change="changePage"
+        :current-page="pageForm.page"
+        v-if="isShow"
+        background
+        layout="prev, pager, next"
+        :total="total"
+        :page-size="pageForm.pageSize"
+      >
+      </el-pagination>
+    </el-row>
   </div>
 </template>
 
 <script>
 import { getAllSchool } from "@/api/school";
-import { getTeacherPage } from "@/api/user";
+import { deleteTeacher, getTeacherPage } from "@/api/user";
 
 export default {
   data() {
@@ -118,9 +238,31 @@ export default {
       schoolData: [],
       multipleSelection: [],
       formInline: {
-          user: '',
-          region: ''
-        }
+        user: "",
+        region: "",
+      },
+      pageOption: [
+        {
+          id: 1,
+          pageSize: 5,
+        },
+        {
+          id: 2,
+          pageSize: 10,
+        },
+        {
+          id: 3,
+          pageSize: 15,
+        },
+        {
+          id: 4,
+          pageSize: 20,
+        },
+      ],
+      status: [
+        { id: 0, name: "正常" },
+        { id: 1, name: "异常" },
+      ],
     };
   },
   created: function () {
@@ -134,10 +276,41 @@ export default {
     });
   },
   methods: {
+    handleUnCheckAll() {
+      this.multipleSelection = [];
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+      this.changePage(pageFormCopy.page);
+    },
+    handleDelete(id, name) {
+      deleteTeacher([id])
+        .then((response) => {
+          this.$message({
+            message: `成功删除了用户：${name}`,
+            type: "success",
+          });
+          console.log("id=" + id);
+          const index = this.multipleSelection.findIndex((item) => item === id);
+          console.log("index=" + index);
+          if (index !== -1) {
+            this.multipleSelection.splice(index, 1);
+          }
+          const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+          this.changePage(pageFormCopy.page);
+        })
+        .catch((error) => {
+          this.$$message({
+            message: `删除失败：${error}`,
+            type: "success",
+          });
+        });
+    },
+    colg(data) {
+      console.log(data);
+    },
     changePage(page) {
-      console.log("page");
       this.pageForm.page = page;
-      getTeacherPage(this.pageForm).then((response) => {
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+      getTeacherPage(pageFormCopy).then((response) => {
         this.tableData = response.data.records;
         this.total = response.data.total;
         this.$nextTick(() => {
@@ -178,26 +351,37 @@ export default {
     getSchoolName(id) {
       return this.schoolData.find((item) => item.id === id)?.name;
     },
-    onSubmit() {
-        console.log('submit!');
-      }
+    handleBatchDelete() {
+      deleteTeacher(this.multipleSelection)
+        .then((response) => {
+          this.$message({
+            message: `成功删除了ID为${this.multipleSelection}的共${this.multipleSelection.length}位用户`,
+            type: "success",
+          });
+          this.multipleSelection = [];
+          this.changePage(1);
+        })
+        .catch((error) => {
+          this.$$message({
+            message: `删除失败：${error}`,
+            type: "success",
+          });
+        });
+    },
   },
 };
 </script>
 
 <style scoped>
-.icon-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 1em; /* 设置宽度为1em */
-  height: 1em; /* 设置高度为1em，与宽度相同保持正方形 */
-  font-size: 1em; /* 调整图标大小，确保它不会超出按钮界限 */
+.el-row {
+  margin-bottom: 20px;
 }
 
-/* 调整图标本身的尺寸以适应容器 */
-.fa-icon {
-  width: 100%;
-  height: 100%;
+.menu-button {
+  margin-left: 25px;
+}
+
+.button-icon {
+  margin-right: 5px;
 }
 </style>
