@@ -221,7 +221,7 @@ export const asyncRoutes = [
       {
         path: 'index',
         component: () => import('@/views/teacher/index'),
-        name: '权限测试页',
+        name: 'teacherlist',
         meta: { roles: ['admin'], title: '教师名单', icon: 'fa-solid fa-list' }  //页面需要的权限
       }]
   },
@@ -236,7 +236,7 @@ export const asyncRoutes = [
       {
         path: 'index',
         component: () => import('@/views/school/index'),
-        name: '权限测试页',
+        name: 'schoollist',
         meta: { roles: ['admin'], title: '学校列表', icon: 'fa-solid fa-list' }  //页面需要的权限
       }]
   },
@@ -251,7 +251,7 @@ export const asyncRoutes = [
       {
         path: 'index',
         component: () => import('@/views/subject/index'),
-        name: '权限测试页',
+        name: 'subjectlist',
         meta: { roles: ['admin'], title: '科目列表', icon: 'fa-solid fa-list' }  //页面需要的权限
       }]
   },
