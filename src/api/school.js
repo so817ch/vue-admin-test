@@ -7,3 +7,11 @@ export function getAllSchool() {
     params:{}
   })
 }
+
+export function getSchoolPage(pageForm) {
+  return request({
+    url: '/school/page',
+    method: 'post',
+    data:pageForm
+  })
+}

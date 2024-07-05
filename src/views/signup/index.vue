@@ -40,7 +40,6 @@
           name="password"
           tabindex="2"
           auto-complete="on"
-          @keyup.enter.native="handleSignUp"
         />
         <span class="show-pwd" @click="showPwd(0)">
           <svg-icon

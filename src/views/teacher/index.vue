@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+    <el-form :inline="true" :model="queryForm" class="demo-form-inline">
       <el-form-item label="ID号">
-        <el-input v-model="formInline.id" placeholder="ID号"></el-input>
+        <el-input v-model="queryForm.id" placeholder="ID号"></el-input>
       </el-form-item>
       <el-form-item label="姓名">
-        <el-input v-model="formInline.name" placeholder="姓名"></el-input>
+        <el-input v-model="queryForm.name" placeholder="姓名"></el-input>
       </el-form-item>
       <el-form-item label="学校">
         <el-select
-          v-model="formInline.schId"
+          v-model="queryForm.schId"
           placeholder="输入以选择学校"
           clearable
           filterable
@@ -26,7 +26,7 @@
       </el-form-item>
       <el-form-item label="状态">
         <el-select
-          v-model="formInline.status"
+          v-model="queryForm.status"
           placeholder="选择状态"
           clearable
           filterable
@@ -47,7 +47,7 @@
       <el-button
         class="menu-button"
         type="primary"
-        @click="colg(multipleSelection)"
+        @click="colg(queryForm)"
       >
         <template>
           <font-awesome-icon
@@ -58,7 +58,7 @@
         </template>
       </el-button>
 
-      <el-button class="menu-button" type="success"
+      <el-button class="menu-button" type="success" @click="handleAdd"
         ><template>
           <font-awesome-icon class="button-icon" icon="fa-solid fa-plus" />
           <span>新增用户</span>
@@ -158,6 +158,7 @@
               <font-awesome-icon
                 class="button-icon"
                 icon="fa-solid fa-circle-info"
+                @click="handleInfo(scope.row.id)"
               />
               <span>编辑</span>
             </template></el-button
@@ -237,9 +238,11 @@ export default {
       tableData: [],
       schoolData: [],
       multipleSelection: [],
-      formInline: {
-        user: "",
-        region: "",
+      queryForm: {
+        id: null,
+        name: '',
+        schId: null,
+        status:null,
       },
       pageOption: [
         {
@@ -276,6 +279,13 @@ export default {
     });
   },
   methods: {
+    handleInfo(id) {
+      //跳转到添加页面，同时传递品牌id，方便在添加页面查询品牌信息，并显示
+      this.$router.push("/teacher/info/" + id);
+    },
+    handleAdd() {
+      this.$router.push({ path: "/teacher/add" });
+    },
     handleUnCheckAll() {
       this.multipleSelection = [];
       const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
@@ -300,7 +310,7 @@ export default {
         .catch((error) => {
           this.$$message({
             message: `删除失败：${error}`,
-            type: "success",
+            type: "error",
           });
         });
     },

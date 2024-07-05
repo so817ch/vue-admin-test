@@ -217,13 +217,32 @@ export const asyncRoutes = [
     name: 'teacher',
     alwaysShow: true,
     meta: { roles: ['admin'], title: '教师管理', icon: 'fa-solid fa-chalkboard-user' }, //页面需要的权限
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/teacher/index'),
-        name: 'teacherlist',
-        meta: { roles: ['admin'], title: '教师名单', icon: 'fa-solid fa-list' }  //页面需要的权限
-      }]
+    children: [{
+      path: 'index',
+      component: () => import('@/views/teacher/index'),
+      name: 'teacherlist',
+      meta: { roles: ['admin'], title: '教师名单', icon: 'fa-solid fa-list' }  //页面需要的权限
+    },
+    {
+      // /brand/edit/123
+      path: 'add',
+      name: 'add',
+      // 此路由不需要在页面上显示
+      hidden: true,
+      component: () =>
+        import('@/views/teacher/info'),
+      meta: { roles: ['admin'], title: '添加教师' }
+    },
+    {
+      // /brand/edit/123
+      path: 'info/:id',
+      name: 'info',
+      // 此路由不需要在页面上显示
+      hidden: true,
+      component: () =>
+        import('@/views/teacher/info'),
+      meta: { roles: ['admin'], title: '教师详情' }
+    },]
   },
 
   {

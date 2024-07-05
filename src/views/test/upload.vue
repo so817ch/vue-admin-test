@@ -4,7 +4,7 @@
       class="upload-demo"
       ref="upload"
       name="file"
-      action="http://localhost:8080/upload"
+      action="http://172.24.67.177:8080/question/upload"
       :on-preview="handlePreview"
       :on-remove="handleRemove"
       :file-list="fileList"
