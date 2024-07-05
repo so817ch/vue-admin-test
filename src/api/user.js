@@ -46,3 +46,18 @@ export function deleteTeacher(ids) {
     // params: { token }
   })
 }
+
+export function getTeacherById(id) {
+  return request({
+    url: `/user/query/${id}`,
+    method:'get'
+  })
+}
+
+export function updateTeacher(form) {
+  return request({
+    url: '/user/update',
+    method: 'put',
+    data:form
+  })
+}

@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true" :model="queryForm" class="demo-form-inline">
+    <el-form :inline="true" :model="queryFormNow" class="demo-form-inline">
       <el-form-item label="ID号">
-        <el-input v-model="queryForm.id" placeholder="ID号"></el-input>
+        <el-input v-model="queryFormNow.id" placeholder="ID号"></el-input>
       </el-form-item>
       <el-form-item label="姓名">
-        <el-input v-model="queryForm.name" placeholder="姓名"></el-input>
+        <el-input v-model="queryFormNow.name" placeholder="姓名"></el-input>
       </el-form-item>
       <el-form-item label="学校">
         <el-select
-          v-model="queryForm.schId"
+          v-model="queryFormNow.schId"
           placeholder="输入以选择学校"
           clearable
           filterable
@@ -26,7 +26,7 @@
       </el-form-item>
       <el-form-item label="状态">
         <el-select
-          v-model="queryForm.status"
+          v-model="queryFormNow.status"
           placeholder="选择状态"
           clearable
           filterable
@@ -44,11 +44,7 @@
     </el-form>
 
     <el-row type="flex" justify="end">
-      <el-button
-        class="menu-button"
-        type="primary"
-        @click="colg(queryForm)"
-      >
+      <el-button class="menu-button" type="primary" @click="handleQuery">
         <template>
           <font-awesome-icon
             class="button-icon"
@@ -65,7 +61,7 @@
         </template></el-button
       >
 
-      <el-button class="menu-button" type="warning"
+      <el-button class="menu-button" type="warning" @click="handleCheckAll"
         ><template>
           <font-awesome-icon
             class="button-icon"
@@ -235,14 +231,21 @@ export default {
 
       // 默认不显示分页
       isShow: false,
+      allData: [],
       tableData: [],
       schoolData: [],
       multipleSelection: [],
       queryForm: {
         id: null,
-        name: '',
+        name: "",
         schId: null,
-        status:null,
+        status: null,
+      },
+      queryFormNow: {
+        id: null,
+        name: "",
+        schId: null,
+        status: null,
       },
       pageOption: [
         {
@@ -268,17 +271,42 @@ export default {
       ],
     };
   },
+  computed: {
+    pageQueryForm() {
+      const mergeForm = { ...this.pageForm, ...this.queryForm };
+      return mergeForm;
+    },
+    getAllPageQueryForm() {
+      const mergeFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
+      mergeFormCopy.page = 1;
+      mergeFormCopy.pageSize = 1000000;
+      return mergeFormCopy;
+    },
+  },
   created: function () {
-    getTeacherPage(this.pageForm).then((response) => {
+    getTeacherPage(this.pageQueryForm).then((response) => {
       this.tableData = response.data.records;
       this.total = response.data.total;
       this.isShow = true;
+    });
+    getTeacherPage(this.getAllPageQueryForm).then((response) => {
+      this.allData = response.data.records;
     });
     getAllSchool().then((response) => {
       this.schoolData = response.data;
     });
   },
   methods: {
+    getAllData() {
+      getTeacherPage(this.getAllPageQueryForm).then((response) => {
+        this.allData = response.data.records;
+      });
+    },
+    handleQuery() {
+      this.multipleSelection = [];
+      this.queryForm = JSON.parse(JSON.stringify(this.queryFormNow));
+      this.changePage(1);
+    },
     handleInfo(id) {
       //跳转到添加页面，同时传递品牌id，方便在添加页面查询品牌信息，并显示
       this.$router.push("/teacher/info/" + id);
@@ -286,9 +314,15 @@ export default {
     handleAdd() {
       this.$router.push({ path: "/teacher/add" });
     },
+    handleCheckAll() {
+      console.log(this.allData);
+      this.multipleSelection = this.allData.map(item => item.id);
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
+      this.changePage(pageFormCopy.page);
+    },
     handleUnCheckAll() {
       this.multipleSelection = [];
-      const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
       this.changePage(pageFormCopy.page);
     },
     handleDelete(id, name) {
@@ -304,11 +338,11 @@ export default {
           if (index !== -1) {
             this.multipleSelection.splice(index, 1);
           }
-          const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+          const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
           this.changePage(pageFormCopy.page);
         })
         .catch((error) => {
-          this.$$message({
+          this.$message({
             message: `删除失败：${error}`,
             type: "error",
           });
@@ -319,10 +353,11 @@ export default {
     },
     changePage(page) {
       this.pageForm.page = page;
-      const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
       getTeacherPage(pageFormCopy).then((response) => {
         this.tableData = response.data.records;
         this.total = response.data.total;
+        this.getAllData();
         this.$nextTick(() => {
           this.setDefaultSelection(); // 确保在表格渲染后调用
         });

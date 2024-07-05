@@ -14,8 +14,12 @@
       <el-form-item label="密码" prop="password">
         <el-input
           v-model="teacherForm.password"
-          :disabled="true"
-          placeholder="默认密码为首字母大写的用户名前五位+联系电话后六位"
+          :disabled="isEdit ? false : true"
+          :placeholder="
+            !isEdit
+              ? '默认密码为首字母大写的用户名前五位+联系电话后六位'
+              : '请输入密码'
+          "
           :key="passwordType"
           :type="passwordType"
         ></el-input>
@@ -41,7 +45,7 @@
       <el-form-item label="账户状态" prop="status">
         <el-radio-group
           v-model="teacherForm.status"
-          :disabled="true"
+          :disabled="isEdit ? false : true"
           size="mini"
         >
           <el-radio-button
@@ -78,12 +82,15 @@
             v-for="item in genderData"
             :key="item.id"
             :label="item.id"
-          >{{ item.name }}</el-radio>
+            >{{ item.name }}</el-radio
+          >
         </el-radio-group>
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="handleAdd">立即创建</el-button>
+        <el-button type="primary" @click="handleSubmit">{{
+          isEdit ? "提交修改" : "立即创建"
+        }}</el-button>
 
         <el-button @click="resetForm('teacherForm')">重置</el-button>
       </el-form-item>
@@ -95,7 +102,7 @@
 import { getAllSchool } from "@/api/school";
 import { validUserName, validPassword, validTel } from "@/utils/validate";
 import Upload from "../test/upload.vue";
-import { register } from "@/api/user";
+import { getTeacherById, register, updateTeacher } from "@/api/user";
 
 export default {
   data() {
@@ -121,6 +128,7 @@ export default {
       }
     };
     return {
+      isEdit: false,
       passwordType: "password",
       status: [
         { id: 0, name: "正常" },
@@ -193,18 +201,32 @@ export default {
         this.teacherForm;
       return res;
     },
+    updateForm() {
+      const formCopy = JSON.parse(JSON.stringify(this.teacherForm));
+      formCopy.updateTime = new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, -5);
+      return formCopy;
+    },
   },
   watch: {
     // 监听电话号码字段
     defaultPassword: function (newValue, oldValue) {
       // 当输入的电话号码长度至少为6位时，设置密码为电话号码的后六位
-      this.teacherForm.password = newValue;
+      if (!this.isEdit) {
+        this.teacherForm.password = newValue;
+      }
     },
   },
   created: function () {
     getAllSchool().then((response) => {
       this.schoolData = response.data;
     });
+    if (this.$route.params.id) {
+      this.isEdit = true;
+      const id = this.$route.params.id;
+      getTeacherById(id).then((response) => {
+        this.teacherForm = response.data;
+      });
+    }
   },
   methods: {
     showPwd() {
@@ -214,26 +236,53 @@ export default {
     getSchoolName(id) {
       return this.schoolData.find((item) => item.id === id)?.name;
     },
-    handleAdd() {
-      this.$refs.teacherForm.validate((valid) => {
-        if (valid) {
-          console.log(this.uploadForm);
-          register(this.uploadForm).then(response => {
-            this.$message({
-              message: "添加成功",
-              type:"success"
-            });
-            this.$router.push({ path: "/teacher/index" });
-          }).catch(error => {
-            this.$message({
-              message: "添加失败",
-              type:"error"
-            });
-          })
-        } else {
-          console.log("error");
-        }
-      });
+    handleSubmit() {
+      if (!this.isEdit) {
+        this.$refs.teacherForm.validate((valid) => {
+          if (valid) {
+            console.log(this.uploadForm);
+            register(this.uploadForm)
+              .then((response) => {
+                this.$message({
+                  message: "添加成功",
+                  type: "success",
+                });
+                this.$router.push({ path: "/teacher/index" });
+              })
+              .catch((error) => {
+                this.$message({
+                  message: "添加失败",
+                  type: "error",
+                });
+              });
+          } else {
+            console.log("error");
+          }
+        });
+      } else {
+        console.log(this.updateForm);
+        this.$refs.teacherForm.validate((valid) => {
+          if (valid) {
+            console.log(this.updateForm);
+            updateTeacher(this.updateForm)
+              .then((response) => {
+                this.$message({
+                  message: "修改成功",
+                  type: "success",
+                });
+                this.$router.push({ path: "/teacher/index" });
+              })
+              .catch((error) => {
+                this.$message({
+                  message: "修改失败",
+                  type: "error",
+                });
+              });
+          } else {
+            console.log("error");
+          }
+        });
+      }
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
