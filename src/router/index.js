@@ -66,27 +66,7 @@ export const constantRoutes = [
     }]
   },
 
-  {
-    path: '/test',
-    component: Layout,
-    alwaysShow: true,
-    meta: { title: '题目评分', icon: 'fa-solid fa-table' },
-    children: [
-      {
-        path: 'index',
-        name: 'test',
-        component: () => import('@/views/test/history'),
-        meta: { title: '历史评分', icon: 'fa-solid fa-clock' }
-      },
-
-      {
-        path: 'upload',
-        name: 'upload',
-        component: () => import('@/views/test/upload'),
-        meta: { title: '上传题目', icon: 'fa-solid fa-cloud-arrow-up' }
-      }
-    ]
-  },
+  
 
   // {
   //   path: '/example',
@@ -196,6 +176,40 @@ export const constantRoutes = [
 ]
 
 export const asyncRoutes = [
+  {
+    path: '/test',
+    component: Layout,
+    alwaysShow: true,
+    meta: { roles: ['editor'], title: '题目评分', icon: 'fa-solid fa-table' },
+    children: [
+      {
+        path: 'index',
+        name: 'test',
+        component: () => import('@/views/test/history'),
+        meta: { roles: ['editor'], title: '历史评分', icon: 'fa-solid fa-clock' }
+      },
+
+      {
+        path: 'upload',
+        name: 'upload',
+        component: () => import('@/views/test/upload'),
+        meta: { roles: ['editor'], title: '上传题目', icon: 'fa-solid fa-cloud-arrow-up' }
+      }
+    ]
+  },
+  {
+    path: '/myinfo',
+    name: 'myinfo',
+    component: Layout,
+    redirect: '/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/teacher/myinfo'),
+        name: 'myinfo',
+        meta: { roles: ['editor'], title: '我的信息', icon: 'fa-solid fa-file' }  //页面需要的权限
+      }]
+  },
   {
     path: '/permission',
     component: Layout,
