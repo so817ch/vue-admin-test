@@ -7,7 +7,7 @@ const getDefaultState = () => {
     token: getToken(),
     name: '',
     introduction:'',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+    avatar: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnBkanBkbXUycnA1MWtnaHltdG5keHhpd3k4eDF6MzF0a2FpY3Z5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ov9k01Y5IKizNmC7S/giphy.gif',
     roles: [],
   }
 }

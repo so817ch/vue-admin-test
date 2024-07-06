@@ -126,9 +126,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="学校" header-align="center">
+      <el-table-column label="学校" header-align="center" >
         <template v-slot="scope">
-          <span>{{ getSchoolName(scope.row.schId) }}</span>
+          <span :style="{color:getSchoolName(scope.row.schId)?'':'#F56C6C'}">{{ getSchoolName(scope.row.schId)||"学校已被删除" }}</span>
         </template>
       </el-table-column>
 

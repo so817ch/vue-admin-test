@@ -15,3 +15,33 @@ export function getSchoolPage(pageForm) {
     data:pageForm
   })
 }
+
+export function deleteSchool(ids) {
+  return request({
+    url: `/school/delete/${ids.join(',')}`,
+    method:'delete'
+  })
+}
+
+export function addSchool(form) {
+  return request({
+    url: `/school/add`,
+    method: 'post',
+    data:form
+  })
+}
+
+export function getSchool(id) {
+  return request({
+    url: `/school/get/${id}`,
+    method: 'get',
+  })
+}
+
+export function updateSchool(form) {
+  return request({
+    url: `/school/update`,
+    method: 'put',
+    data: form
+  })
+}

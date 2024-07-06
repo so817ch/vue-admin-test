@@ -1,19 +1,16 @@
 <template>
   <div class="app-container">
-    <el-form :inline="true" :model="queryForm" class="demo-form-inline">
-    
+    <el-form :inline="true" :model="queryFormNow" class="demo-form-inline">
       <el-form-item label="学校名称">
-        <el-input v-model="queryForm.name" placeholder="学校名称"></el-input>
+        <el-input
+          v-model="queryFormNow.name"
+          placeholder="输入学校名称"
+        ></el-input>
       </el-form-item>
-      
     </el-form>
 
     <el-row type="flex" justify="end">
-      <el-button
-        class="menu-button"
-        type="primary"
-        @click="colg(queryForm)"
-      >
+      <el-button class="menu-button" type="primary" @click="handleQuery">
         <template>
           <font-awesome-icon
             class="button-icon"
@@ -23,14 +20,14 @@
         </template>
       </el-button>
 
-      <el-button class="menu-button" type="success"
+      <el-button class="menu-button" type="success" @click="handleAdd"
         ><template>
           <font-awesome-icon class="button-icon" icon="fa-solid fa-plus" />
-          <span>新增用户</span>
+          <span>新增学校</span>
         </template></el-button
       >
 
-      <el-button class="menu-button" type="warning"
+      <el-button class="menu-button" type="warning" @click="handleCheckAll"
         ><template>
           <font-awesome-icon
             class="button-icon"
@@ -66,7 +63,7 @@
       style="width: 100%"
       @select="handleSelection"
       @select-all="handleSelectAll"
-      ref="teacherTable"
+      ref="schoolTable"
     >
       <el-table-column type="selection" width="55" align="center">
       </el-table-column>
@@ -77,7 +74,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="学校"  align="center">
+      <el-table-column label="学校" align="center">
         <template v-slot="scope">
           <span>{{ scope.row.name }}</span>
         </template>
@@ -86,7 +83,7 @@
       <el-table-column label="操作" width="200" header-align="center">
         <template v-slot="scope">
           <!-- 点击按钮时，将id传入方法 -->
-          <el-button size="mini" @click="handleInfo(scope.row.id)"
+          <el-button size="mini" @click="handleEdit(scope.row.id)"
             ><template>
               <font-awesome-icon
                 class="button-icon"
@@ -152,8 +149,15 @@
 </template>
 
 <script>
-import { getSchoolPage } from "@/api/school";
-import { deleteTeacher } from "@/api/user";
+import {
+  deleteSchool,
+  getAllSchool,
+  getSchoolPage,
+  addSchool,
+  getSchool,
+  updateSchool
+} from "@/api/school";
+import { deleteTeacher, getTeacherPage } from "@/api/user";
 
 export default {
   data() {
@@ -167,10 +171,15 @@ export default {
 
       // 默认不显示分页
       isShow: false,
+      allData: [],
       tableData: [],
+      schoolData: [],
       multipleSelection: [],
       queryForm: {
-        name: '',
+        name: "",
+      },
+      queryFormNow: {
+        name: "",
       },
       pageOption: [
         {
@@ -196,21 +205,125 @@ export default {
       ],
     };
   },
+  computed: {
+    pageQueryForm() {
+      const mergeForm = { ...this.pageForm, ...this.queryForm };
+      return mergeForm;
+    },
+    getAllPageQueryForm() {
+      const mergeFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
+      mergeFormCopy.page = 1;
+      mergeFormCopy.pageSize = 1000000;
+      return mergeFormCopy;
+    },
+  },
   created: function () {
     getSchoolPage(this.pageForm).then((response) => {
       this.tableData = response.data.records;
       this.total = response.data.total;
       this.isShow = true;
     });
+    // getTeacherPage(this.getAllPageQueryForm).then((response) => {
+    //   this.allData = response.data.records;
+    // });
+    getAllSchool().then((response) => {
+      this.allData = response.data;
+    });
   },
   methods: {
+    getAllData() {
+      getAllSchool().then((response) => {
+        this.allData = response.data;
+      });
+    },
+    handleQuery() {
+      // this.multipleSelection = [];
+      // this.queryForm = JSON.parse(JSON.stringify(this.queryFormNow));
+      // this.changePage(1);
+    },
+    handleEdit(id) {
+      //跳转到添加页面，同时传递品牌id，方便在添加页面查询品牌信息，并显示
+      // this.$router.push("/teacher/info/" + id);
+      getSchool(id).then((response) => {
+        const oldName = response.data.name;
+        this.$prompt("请输入新学校名称", "修改学校", {
+          inputValue: oldName,
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+        })
+          .then(({ value }) => {
+            const name = value;
+            updateSchool({ id, name })
+              .then(() => {
+                this.$message({
+                  type: "success",
+                  message: `成功修改学校”${oldName}“为”${name}“`,
+                });
+                const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+                this.changePage(pageFormCopy.page);
+              })
+              .catch((error) => {
+                this.$message({
+                  type: "error",
+                  message: "修改失败: " + error,
+                });
+              });
+            // this.$router.go(0);
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "取消输入",
+            });
+          });
+      });
+    },
+    handleAdd() {
+      // this.$router.push({ path: "/teacher/add" });
+      this.$prompt("请输入学校名称", "添加学校", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      })
+        .then(({ value }) => {
+          const name = value;
+          addSchool({ name })
+            .then(() => {
+              this.$message({
+                type: "success",
+                message: "添加了学校: " + name,
+              });
+              const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+              this.changePage(pageFormCopy.page);
+            })
+            .catch((error) => {
+              this.$message({
+                type: "error",
+                message: "添加失败: " + error,
+              });
+            });
+          // this.$router.go(0);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入",
+          });
+        });
+    },
+    handleCheckAll() {
+      console.log(this.allData);
+      this.multipleSelection = this.allData.map((item) => item.id);
+      console.log(this.multipleSelection);
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+      this.changePage(pageFormCopy.page);
+    },
     handleUnCheckAll() {
       this.multipleSelection = [];
       const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
       this.changePage(pageFormCopy.page);
     },
     handleDelete(id, name) {
-      deleteTeacher([id])
+      deleteSchool([id])
         .then((response) => {
           this.$message({
             message: `成功删除了学校：${name}`,
@@ -226,7 +339,7 @@ export default {
           this.changePage(pageFormCopy.page);
         })
         .catch((error) => {
-          this.$$message({
+          this.$message({
             message: `删除失败：${error}`,
             type: "error",
           });
@@ -241,6 +354,7 @@ export default {
       getSchoolPage(pageFormCopy).then((response) => {
         this.tableData = response.data.records;
         this.total = response.data.total;
+        this.getAllData();
         this.$nextTick(() => {
           this.setDefaultSelection(); // 确保在表格渲染后调用
         });
@@ -272,15 +386,18 @@ export default {
     setDefaultSelection() {
       this.tableData.forEach((row) => {
         if (this.multipleSelection.includes(row.id)) {
-          this.$refs.teacherTable.toggleRowSelection(row, true);
+          this.$refs.schoolTable.toggleRowSelection(row, true);
         }
       });
     },
+    getSchoolName(id) {
+      return this.schoolData.find((item) => item.id === id)?.name;
+    },
     handleBatchDelete() {
-      deleteTeacher(this.multipleSelection)
+      deleteSchool(this.multipleSelection)
         .then((response) => {
           this.$message({
-            message: `成功删除了ID为${this.multipleSelection}的共${this.multipleSelection.length}位用户`,
+            message: `成功删除了ID为${this.multipleSelection}的共${this.multipleSelection.length}个学校`,
             type: "success",
           });
           this.multipleSelection = [];
