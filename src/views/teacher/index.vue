@@ -142,7 +142,13 @@
 
       <el-table-column label="注册时间" align="center">
         <template v-slot="scope">
-          <span>{{ scope.row.createTime }}</span>
+          <span>{{ scope.row.createTime.replace("T"," ") }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="最后修改" align="center">
+        <template v-slot="scope">
+          <span>{{ scope.row.updateTime.replace("T"," ") }}</span>
         </template>
       </el-table-column>
 

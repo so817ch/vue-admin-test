@@ -217,34 +217,29 @@ export default {
       mergeFormCopy.pageSize = 1000000;
       return mergeFormCopy;
     },
-    getAllPageForm() {
-      const mergeFormCopy = JSON.parse(JSON.stringify(this.pageForm));
-      mergeFormCopy.page = 1;
-      mergeFormCopy.pageSize = 1000000;
-      return mergeFormCopy;
-    },
+    
   },
   created: function () {
-    getSubjectPage(this.pageForm).then((response) => {
+    getSubjectPage(this.pageQueryForm).then((response) => {
       this.tableData = response.data.records;
       this.total = response.data.total;
       this.isShow = true;
     });
-    getSubjectPage(this.getAllPageForm).then((response) => {
+    getSubjectPage(this.getAllPageQueryForm).then((response) => {
       this.allData = response.data.records;
     });
     
   },
   methods: {
     getAllData() {
-      getSubjectPage(this.getAllPageForm).then((response) => {
+      getSubjectPage(this.getAllPageQueryForm).then((response) => {
       this.allData = response.data.records;
     });
     },
     handleQuery() {
-      // this.multipleSelection = [];
-      // this.queryForm = JSON.parse(JSON.stringify(this.queryFormNow));
-      // this.changePage(1);
+      this.multipleSelection = [];
+      this.queryForm = JSON.parse(JSON.stringify(this.queryFormNow));
+      this.changePage(1);
     },
     handleEdit(id) {
       //跳转到添加页面，同时传递品牌id，方便在添加页面查询品牌信息，并显示
@@ -264,7 +259,7 @@ export default {
                   type: "success",
                   message: `成功修改科目”${oldName}“为”${name}“`,
                 });
-                const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+                const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
                 this.changePage(pageFormCopy.page);
               })
               .catch((error) => {
@@ -297,7 +292,7 @@ export default {
                 type: "success",
                 message: "添加了科目: " + name,
               });
-              const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+              const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
               this.changePage(pageFormCopy.page);
             })
             .catch((error) => {
@@ -319,12 +314,12 @@ export default {
       console.log(this.allData);
       this.multipleSelection = this.allData.map((item) => item.id);
       console.log(this.multipleSelection);
-      const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
       this.changePage(pageFormCopy.page);
     },
     handleUnCheckAll() {
       this.multipleSelection = [];
-      const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
       this.changePage(pageFormCopy.page);
     },
     handleDelete(id, name) {
@@ -340,7 +335,7 @@ export default {
           if (index !== -1) {
             this.multipleSelection.splice(index, 1);
           }
-          const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+          const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
           this.changePage(pageFormCopy.page);
         })
         .catch((error) => {
@@ -355,7 +350,7 @@ export default {
     },
     changePage(page) {
       this.pageForm.page = page;
-      const pageFormCopy = JSON.parse(JSON.stringify(this.pageForm));
+      const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
       getSubjectPage(pageFormCopy).then((response) => {
         this.tableData = response.data.records;
         this.total = response.data.total;

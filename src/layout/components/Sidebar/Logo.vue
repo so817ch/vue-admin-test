@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       title: '爱批试卷',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      logo: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnBkanBkbXUycnA1MWtnaHltdG5keHhpd3k4eDF6MzF0a2FpY3Z5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ov9k01Y5IKizNmC7S/giphy.gif'
     }
   }
 }
@@ -55,8 +55,8 @@ export default {
     width: 100%;
 
     & .sidebar-logo {
-      width: 32px;
-      height: 32px;
+      width: 54px;
+      height: 50px;
       vertical-align: middle;
       margin-right: 12px;
     }
