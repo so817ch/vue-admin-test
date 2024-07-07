@@ -94,7 +94,7 @@
           <el-option
             v-for="item in allSubject"
             :key="item.id"
-            :label="item.name"
+            :label="item.id+'-'+item.name"
             :value="item"
           >
           </el-option>
@@ -116,7 +116,6 @@
 import { mapGetters } from "vuex";
 import { getAllSchool } from "@/api/school";
 import { validUserName, validPassword, validTel } from "@/utils/validate";
-import Upload from "../test/upload.vue";
 import {
   addTeacherSubject,
   deleteTeacherSubject,

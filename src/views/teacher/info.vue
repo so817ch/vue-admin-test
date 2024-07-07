@@ -122,7 +122,6 @@
 import { mapGetters } from "vuex";
 import { getAllSchool } from "@/api/school";
 import { validUserName, validPassword, validTel } from "@/utils/validate";
-import Upload from "../test/upload.vue";
 import { getTeacherById, getTeacherSubject, register, updateTeacher } from "@/api/user";
 import { getSubject, getSubjectPage } from "@/api/subject";
 
