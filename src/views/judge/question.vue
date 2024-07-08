@@ -13,7 +13,7 @@
           <el-option
             v-for="item in subjectData"
             :key="item.id"
-            :label="item.name"
+            :label="item.id + '-' + item.name"
             :value="item.id"
           ></el-option>
         </el-select>
@@ -45,6 +45,8 @@
           action="http://localhost:8080/question/upload"
           multiple
           :headers="{ token: this.token }"
+          :on-success="handleUploadSuccess"
+          :on-error="handleUploadError"
         >
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -149,7 +151,6 @@
       <el-table-column label="操作" width="275" header-align="center">
         <template v-slot="scope">
           <!-- 点击按钮时，将id传入方法 -->
-          
 
           <el-button size="mini" @click="handleEdit(scope.row.id)"
             ><template>
@@ -317,7 +318,20 @@ export default {
     });
   },
   methods: {
-    
+    handleUploadSuccess(response, file, fileList) {
+      console.log(response);
+      this.$message({
+        type: "success",
+        message: "上传成功",
+      });
+      this.changePage(1);
+    },
+    handleUploadError(err, file, fileList) {
+      this.$message({
+        type: "error",
+        message: "上传失败",
+      });
+    },
     getAllData() {
       getQuestionPage(this.getAllPageQueryForm).then((response) => {
         this.allData = response.data.records;

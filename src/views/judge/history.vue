@@ -76,7 +76,11 @@
         </template></el-button
       >
 
-      <el-button class="menu-button" type="success" @click="handleBatchJudge"
+      <el-button
+        class="menu-button"
+        type="success"
+        @click="handleBatchJudge"
+        :loading="isJudging"
         ><template>
           <font-awesome-icon
             class="button-icon"
@@ -90,7 +94,7 @@
         ><template>
           <font-awesome-icon
             class="button-icon"
-            icon="fa-solid fa-list-check"
+            icon="fa-solid fa-file-excel"
           />
           <span>导出Excel</span>
         </template></el-button
@@ -187,20 +191,29 @@
 
       <el-table-column label="得分" width="65" align="center">
         <template v-slot="scope">
-          <span
-            :style="{
-              color:
-                scope.row.status &&
-                scope.row.ansScore / scope.row.queScore < 0.6
-                  ? '#F56C6C'
-                  : '',
-            }"
-            >{{
-              scope.row.status
-                ? scope.row.ansScore + "/" + scope.row.queScore
-                : "-"
-            }}</span
+          <el-popover
+            placement="top-start"
+            title="得分点"
+            width="200"
+            trigger="hover"
+            :content="scope.row.scoreDetail"
           >
+            <span
+              slot="reference"
+              :style="{
+                color:
+                  scope.row.status &&
+                  scope.row.ansScore / scope.row.queScore < 0.6
+                    ? '#F56C6C'
+                    : '',
+              }"
+              >{{
+                scope.row.status
+                  ? scope.row.ansScore + "/" + scope.row.queScore
+                  : "-"
+              }}</span
+            >
+          </el-popover>
         </template>
       </el-table-column>
 
@@ -236,7 +249,8 @@
           <el-button
             size="mini"
             type="success"
-            @click="handleJudge(scope.row.id)"
+            :loading="isLoading[scope.$index]"
+            @click="handleJudge(scope.row.id,scope.$index)"
             ><template>
               <font-awesome-icon class="button-icon" icon="fa-solid fa-list" />
               <span>判题</span>
@@ -334,6 +348,8 @@ import { deleteAnswer, getAnswerPage, judgeAnswer } from "@/api/answer";
 export default {
   data() {
     return {
+      isLoading:[],
+      isJudging: false,
       currentPage: 1,
       total: 1,
       pageForm: {
@@ -403,20 +419,20 @@ export default {
     },
   },
   watch: {
-    // tableData: {
-    //   handler(newVal) {
-    //     let tableDataCopy=JSON.parse(JSON.stringify(this.tableData))
-    //     tableDataCopy.sort((a, b) => new Date(b.createTime) - new Date(a.createTime));
-    //   },
-    //   deep: true,
-    //   immediate: true // 初始化时立即执行
-    // }
+    tableData: {
+      handler(newVal) {
+        this.isLoading= Array.from({ length: this.tableData.length }, () => false);
+      },
+      deep: true,
+      immediate: true // 初始化时立即执行
+    }
   },
   created: function () {
     getAnswerPage(this.pageQueryForm).then((response) => {
       this.tableData = response.data.records;
       this.total = response.data.total;
       this.isShow = true;
+      this.isLoading = Array.from({ length: this.tableData.length }, () => false);
     });
     getAnswerPage(this.getAllPageQueryForm).then((response) => {
       this.allData = response.data.records;
@@ -455,25 +471,31 @@ export default {
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "反馈报告");
 
-      const timeNow=new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, -5);
+      const timeNow = new Date(new Date().getTime() + 8 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, -5);
       // 生成Excel文件并保存
-      XLSX.writeFile(workbook, timeNow+".xlsx");
+      XLSX.writeFile(workbook, timeNow + ".xlsx");
     },
-    handleJudge(id) {
+    handleJudge(id, index) {
+      this.$set(this.isLoading, index, true);
       judgeAnswer([id])
         .then((response) => {
           this.$message({
             type: "success",
             message: "成功",
           });
+          this.$set(this.isLoading, index, false);
           const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
           this.changePage(pageFormCopy.page);
+          
         })
         .catch((err) => {
           this.$message({
             type: "error",
             message: "失败",
           });
+          this.$set(this.isLoading, index, false);
         });
     },
     handleUploadSuccess(response, file, fileList) {
@@ -610,6 +632,7 @@ export default {
     //   return this.schoolData.find((item) => item.id === id)?.name;
     // },
     handleBatchJudge() {
+      this.isJudging = true;
       judgeAnswer(this.multipleSelection)
         .then((response) => {
           this.$message({
@@ -619,12 +642,14 @@ export default {
           this.multipleSelection = [];
           const pageFormCopy = JSON.parse(JSON.stringify(this.pageQueryForm));
           this.changePage(pageFormCopy.page);
+          this.isJudging = false;
         })
         .catch((err) => {
           this.$$message({
             message: `失败：${err}`,
             type: "success",
           });
+          this.isJudging = false;
         });
     },
     handleBatchDelete() {

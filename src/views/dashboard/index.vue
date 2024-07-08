@@ -1,10 +1,11 @@
 <template>
   <div class="dashboard-container">
     <div class="dashboard-text">
-      name: {{ roles[0] === "admin" ? name + roles + "!" : name }}
+      欢迎: {{ roles[0] === "admin" ? name + roles + "!" : name }}
     </div>
-
-    <el-select
+    <el-form :inline="true" class="demo-form-inline">
+      <el-form-item label="科目">
+        <el-select
           v-model="subId"
           placeholder="输入以选择科目"
           clearable
@@ -12,37 +13,66 @@
           name="subject"
           ref="subject"
           @change="onChange"
+          @clear="onClear"
+          v-if="roles[0] !== 'admin'"
         >
           <el-option
             v-for="item in subjectData"
             :key="item.id"
-            :label="item.name"
+            :label="item.id + '-' + item.name"
             :value="item.id"
           ></el-option>
         </el-select>
-    <v-chart class="chart" :option="options" />
+      </el-form-item>
+    </el-form>
+
+    <div class="charts-row" v-if="roles[0] !== 'admin'">
+      <v-chart
+        class="chart"
+        :option="options"
+        :initOptions="{ renderer: 'svg' }"
+      />
+      <v-chart
+        class="chart2"
+        :option="options2"
+        :initOptions="{ renderer: 'svg' }"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import { labelOption } from "@/utils/chart-parameter";
+import { option2 } from "@/utils/echarts-ring";
+import * as echarts from "echarts";
 import { mapGetters } from "vuex";
 import { getChartData } from "@/api/chart"; // 引入 API 文件
 import { getStatistics, getTeacherSubject } from "@/api/user";
 import { getMyId } from "@/utils/userinfo";
+import { render } from "nprogress";
+import { getAnswerPage } from "@/api/answer";
 
 export default {
   name: "Dashboard",
   data() {
     return {
+      allQuestionNum: null,
+      answerData: [],
       questionData: [],
       subId: null,
-      subjectData:[]
+      subjectData: [],
     };
   },
   computed: {
+    options2() {
+      option2.dataset.source = [[1, this.allQuestionNum]];
+      return option2;
+    },
     options() {
       return {
+        title: {
+          text: "科目整体问题得分情况",
+        },
         tooltip: {
           trigger: "axis",
           axisPointer: {
@@ -69,7 +99,10 @@ export default {
           {
             type: "category",
             axisTick: { show: false },
-            data: this.questionData.map(item=>item.queText),
+            data: this.questionData.map((item) => item.queText),
+            axisLabel: {
+              rotate: 15, // 这里设置x轴标签旋转90度
+            },
           },
         ],
         yAxis: [
@@ -89,7 +122,9 @@ export default {
             emphasis: {
               focus: "series",
             },
-            data: this.questionData.map(item=>item.maxRate),
+            data: this.questionData.map((item) =>
+              (item.maxRate * 100).toFixed(2)
+            ),
           },
           {
             name: "平均分",
@@ -101,7 +136,9 @@ export default {
             emphasis: {
               focus: "series",
             },
-            data:this.questionData.map(item=>item.avgRate),
+            data: this.questionData.map((item) =>
+              (item.avgRate * 100).toFixed(2)
+            ),
           },
           {
             name: "最低分",
@@ -113,7 +150,9 @@ export default {
             emphasis: {
               focus: "series",
             },
-            data: this.questionData.map(item=>item.minRate),
+            data: this.questionData.map((item) =>
+              (item.minRate * 100).toFixed(2)
+            ),
           },
           // {
           //   name: "Wetland",
@@ -133,34 +172,60 @@ export default {
     queryForm() {
       return {
         userId: this.myId,
-        subId:this.subId
-      }
+        subId: this.subId,
+      };
     },
-    ...mapGetters(["roles", "name","token"]),
+    ...mapGetters(["roles", "name", "token"]),
   },
   created() {
-    getTeacherSubject(this.myId).then(response => {
+    getTeacherSubject(this.myId).then((response) => {
       this.subjectData = response.data;
       this.subId = this.subjectData[0].id;
-      getStatistics(this.queryForm).then(response => {
+      getStatistics(this.queryForm).then((response) => {
         this.questionData = response.data;
       });
-    })
-
+    });
+    getAnswerPage({
+      page: 1,
+      pageSize: 100000,
+      queId: null,
+      status: null,
+      subId: null,
+      userId: this.myId,
+    }).then((response) => {
+      this.allQuestionNum = response.data.records.filter(
+        (item) => item.status === 1
+      ).length;
+    });
   },
   methods: {
+    onClear() {},
     onChange() {
-      getStatistics(this.queryForm).then(response => {
-        this.questionData = response.data;
-      });
-    }
+      if (this.queryForm.subId) {
+        getStatistics(this.queryForm).then((response) => {
+          this.questionData = response.data;
+        });
+      }
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.charts-row {
+  display: flex;
+  justify-content: space-between; /* 或者使用 justify-content: space-around; */
+  gap: 20px; /* 可选，设置图表之间的间距 */
+}
+
 .chart {
-  height: 400px;
+  flex: 2; /* 使每个图表平分父容器的宽度 */
+  height: 500px; /* 设置图表高度 */
+}
+
+.chart2 {
+  flex: 1; /* 使每个图表平分父容器的宽度 */
+  height: 500px;
 }
 
 .dashboard {

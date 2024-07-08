@@ -120,7 +120,7 @@ option = {
     {
       type: 'category',
       axisTick: { show: false },
-      data: ['2012', '2013', '2014', '2015', '2016']
+      data: ['2012', '2013', '2014', '2015', '2016'],
     }
   ],
   yAxis: [
