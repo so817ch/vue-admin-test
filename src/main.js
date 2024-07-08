@@ -51,7 +51,7 @@ library.add(fas, far, fab)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.config.productionTip = false
-
+console.log(Vue.version);
 
 new Vue({
   el: '#app',

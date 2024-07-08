@@ -149,12 +149,7 @@
       <el-table-column label="操作" width="275" header-align="center">
         <template v-slot="scope">
           <!-- 点击按钮时，将id传入方法 -->
-          <el-button size="mini" @click="handleShowAnswer(scope.row.id)"
-            ><template>
-              <font-awesome-icon class="button-icon" icon="fa-solid fa-list" />
-              <span>判题</span>
-            </template></el-button
-          >
+          
 
           <el-button size="mini" @click="handleEdit(scope.row.id)"
             ><template>
@@ -322,9 +317,7 @@ export default {
     });
   },
   methods: {
-    handleShowAnswer(id) {
-      this.$router.push("/judge/answer/" + id);
-    },
+    
     getAllData() {
       getQuestionPage(this.getAllPageQueryForm).then((response) => {
         this.allData = response.data.records;

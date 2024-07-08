@@ -326,6 +326,7 @@ import {
   getSubjectPage,
   updateSubject,
 } from "@/api/subject";
+import * as XLSX from "xlsx";
 import { deleteTeacher, getTeacherPage, getTeacherSubject } from "@/api/user";
 import { getMyId } from "@/utils/userinfo";
 import { deleteAnswer, getAnswerPage, judgeAnswer } from "@/api/answer";
@@ -444,6 +445,7 @@ export default {
         });
       });
       console.log(toGenerateAnswerCN);
+      this.exportToExcel(toGenerateAnswerCN);
     },
     exportToExcel(objList) {
       // 将JSON对象数组转换为工作表
@@ -451,10 +453,11 @@ export default {
 
       // 创建一个工作簿
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "人员信息");
+      XLSX.utils.book_append_sheet(workbook, worksheet, "反馈报告");
 
+      const timeNow=new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, -5);
       // 生成Excel文件并保存
-      XLSX.writeFile(workbook, "人员信息.xlsx");
+      XLSX.writeFile(workbook, timeNow+".xlsx");
     },
     handleJudge(id) {
       judgeAnswer([id])
