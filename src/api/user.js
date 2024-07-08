@@ -90,3 +90,11 @@ export function deleteTeacherSubject(ids) {
     method: 'post',
   })
 }
+
+export function getStatistics(form) {
+  return request({
+    url: '/user',
+    method: 'post',
+    data:form
+  })
+}
