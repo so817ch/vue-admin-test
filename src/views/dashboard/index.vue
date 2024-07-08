@@ -4,7 +4,7 @@
       欢迎: {{ roles[0] === "admin" ? name + roles + "!" : name }}
     </div>
     <el-form :inline="true" class="demo-form-inline">
-      <el-form-item label="科目">
+      <el-form-item label="我的科目">
         <el-select
           v-model="subId"
           placeholder="输入以选择科目"

@@ -5,8 +5,8 @@ export var ROOT_PATH = 'https://echarts.apache.org/examples';
 
 export var _panelImageURL = ROOT_PATH + '/data/asset/img/custom-gauge-panel.png';
 // export var _panelImageURL = 'https://www.colorcombos.com/images/colors/409EFF.png';
-export var _animationDuration = 3000;
-export var _animationDurationUpdate = 3000;
+export var _animationDuration = 4000;
+export var _animationDurationUpdate = 4000;
 export var _animationEasingUpdate = 'quarticInOut';
 export var _valOnRadianMax = 1;
 var _outerRadius = 150;
