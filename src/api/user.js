@@ -61,3 +61,32 @@ export function updateTeacher(form) {
     data:form
   })
 }
+
+export function getTeacherSubject(id) {
+  return request({
+    url: `/user/querySubject/${id}`,
+    method: 'get',
+  })
+}
+
+export function addTeacherSubject(ids) {
+  if (!ids.length) {
+    // 直接返回一个解决的Promise，可以传递任何你认为合适的值
+    return Promise.resolve('No operation - no ids provided');
+  }
+  return request({
+    url: `/user/addSubject/${ids.join(',')}`,
+    method: 'post',
+  })
+}
+
+export function deleteTeacherSubject(ids) {
+  if (!ids.length) {
+    // 直接返回一个解决的Promise，可以传递任何你认为合适的值
+    return Promise.resolve('No operation - no ids provided');
+  }
+  return request({
+    url: `/user/deleteSubject/${ids.join(',')}`,
+    method: 'post',
+  })
+}

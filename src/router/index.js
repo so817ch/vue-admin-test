@@ -66,27 +66,7 @@ export const constantRoutes = [
     }]
   },
 
-  {
-    path: '/test',
-    component: Layout,
-    alwaysShow: true,
-    meta: { title: '题目评分', icon: 'fa-solid fa-table' },
-    children: [
-      {
-        path: 'index',
-        name: 'test',
-        component: () => import('@/views/test/history'),
-        meta: { title: '历史评分', icon: 'fa-solid fa-clock' }
-      },
 
-      {
-        path: 'upload',
-        name: 'upload',
-        component: () => import('@/views/test/upload'),
-        meta: { title: '上传题目', icon: 'fa-solid fa-cloud-arrow-up' }
-      }
-    ]
-  },
 
   // {
   //   path: '/example',
@@ -196,6 +176,92 @@ export const constantRoutes = [
 ]
 
 export const asyncRoutes = [
+  {
+    path: '/judge',
+    component: Layout,
+    alwaysShow: true,
+    meta: { roles: ['editor'], title: '题目评分', icon: 'fa-solid fa-table' },
+    children: [
+      {
+        path: 'index',
+        name: 'test',
+        component: () => import('@/views/judge/history'),
+        meta: { roles: ['editor'], title: '最近上传', icon: 'fa-solid fa-clock' }
+      },
+
+      {
+        path: 'question',
+        name: 'question',
+        component: () => import('@/views/judge/question'),
+        meta: { roles: ['editor'], title: '题目列表', icon: 'fa-solid fa-cloud-arrow-up' },
+      },
+      
+      {
+        // /brand/edit/123
+        path: 'addquestion',
+        name: 'addquestion',
+        // 此路由不需要在页面上显示
+        hidden: true,
+        component: () =>
+          import('@/views/judge/questionInfo'),
+        meta: { roles: ['editor'], title: '添加问题' }
+      },
+      {
+        // /brand/edit/123
+        path: 'questioninfo/:id',
+        name: 'questioninfo',
+        // 此路由不需要在页面上显示
+        hidden: true,
+        component: () =>
+          import('@/views/judge/questionInfo'),
+        meta: { roles: ['editor'], title: '教师详情' }
+      },
+      {
+        // /brand/edit/123
+        path: 'answer/:id',
+        name: 'answer',
+        // 此路由不需要在页面上显示
+        hidden: true,
+        component: () =>
+          import('@/views/judge/answer'),
+        meta: { roles: ['editor'], title: '查看作答' }
+      },
+
+      {
+        // /brand/edit/123
+        path: 'addanswer',
+        name: 'addanswer',
+        // 此路由不需要在页面上显示
+        hidden: true,
+        component: () =>
+          import('@/views/judge/answerInfo'),
+        meta: { roles: ['editor'], title: '添加作答' }
+      },
+      {
+        // /brand/edit/123
+        path: 'answerinfo/:id',
+        name: 'answerinfo',
+        // 此路由不需要在页面上显示
+        hidden: true,
+        component: () =>
+          import('@/views/judge/answerInfo'),
+        meta: { roles: ['editor'], title: '作答详情' }
+      },
+    ]
+  },
+  {
+    path: '/myinfo',
+    name: 'myinfo',
+    component: Layout,
+    redirect: '/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/teacher/myinfo'),
+        name: '我的信息',
+        meta: { roles: ['editor'], title: '我的信息', icon: 'fa-solid fa-file' }  //页面需要的权限
+      }]
+  },
   {
     path: '/permission',
     component: Layout,

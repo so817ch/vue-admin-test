@@ -5,6 +5,7 @@ import { resetRouter } from '@/router'
 const getDefaultState = () => {
   return {
     token: getToken(),
+    id:null,
     name: '',
     introduction:'',
     avatar: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnBkanBkbXUycnA1MWtnaHltdG5keHhpd3k4eDF6MzF0a2FpY3Z5ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ov9k01Y5IKizNmC7S/giphy.gif',
@@ -20,6 +21,9 @@ const mutations = {
   },
   SET_TOKEN: (state, token) => {
     state.token = token
+  },
+  SET_ID: (state, id) => {
+    state.id = id
   },
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction
