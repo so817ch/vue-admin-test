@@ -86,6 +86,16 @@
         </template></el-button
       >
 
+      <el-button class="menu-button" type="success" @click="handleGenerateExcel"
+        ><template>
+          <font-awesome-icon
+            class="button-icon"
+            icon="fa-solid fa-list-check"
+          />
+          <span>导出Excel</span>
+        </template></el-button
+      >
+
       <el-popover placement="right" width="400" trigger="click">
         <el-upload
           class="upload-demo"
@@ -415,6 +425,37 @@ export default {
     });
   },
   methods: {
+    handleGenerateExcel() {
+      const toGenerateAnswerEN = this.allData.filter((item) =>
+        this.multipleSelection.includes(item.id)
+      );
+      console.log(toGenerateAnswerEN);
+      let toGenerateAnswerCN = [];
+      toGenerateAnswerEN.forEach((item) => {
+        toGenerateAnswerCN.push({
+          答案ID: item.id,
+          答案描述: item.ansText,
+          题目描述: item.queText,
+          所属课程: item.subName,
+          答案得分: item.ansScore,
+          题目分值: item.queScore,
+          得分率: item.ansScore / item.queScore,
+          得分点: item.scoreDetail,
+        });
+      });
+      console.log(toGenerateAnswerCN);
+    },
+    exportToExcel(objList) {
+      // 将JSON对象数组转换为工作表
+      const worksheet = XLSX.utils.json_to_sheet(objList);
+
+      // 创建一个工作簿
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "人员信息");
+
+      // 生成Excel文件并保存
+      XLSX.writeFile(workbook, "人员信息.xlsx");
+    },
     handleJudge(id) {
       judgeAnswer([id])
         .then((response) => {

@@ -22,10 +22,10 @@
           size="small"
           v-model="answerForm.score"
           :min="0"
-          :max="100"
+          :max="queScore"
           :disabled="answerForm.status ? false : true"
         ></el-input-number>
-        <span v-if="isEdit">/10</span>
+        <span v-if="isEdit">/{{ queScore }}</span>
       </el-form-item>
 
       <el-form-item label="所属科目" prop="subId">
@@ -73,7 +73,7 @@
           isEdit ? "提交修改" : "立即创建"
         }}</el-button>
 
-        <el-button @click="resetForm('answerForm')">重置</el-button>
+        <el-button @click="clog">重置</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -97,7 +97,7 @@ import {
   updateQuestion,
 } from "@/api/question";
 import { getMyId } from "@/utils/userinfo";
-import { addAnswer, getAnswer } from "@/api/answer";
+import { addAnswer, getAnswer, updateAnswer } from "@/api/answer";
 
 export default {
   data() {
@@ -107,30 +107,20 @@ export default {
 
       subjectData: [],
       questionData: [],
-      
+      subId: null,
+      queScore:null,
       answerForm: {
         createTime: "",
+        
         id: null,
         queId: null,
         score: null,
-        subId: null,
+        
         status: null,
         text: "",
         updateTime: "",
       },
-      newAnsForm: {
-        ansScore: 0,
-        ansText: "",
-        createTime: "",
-        id: 0,
-        queId: 0,
-        queScore: 0,
-        queText: "",
-        status: 0,
-        subName: "",
-        updateTime: "",
-        userId: 0,
-      },
+      
       schoolData: [],
       rules: {
         text: [
@@ -181,7 +171,20 @@ export default {
       this.isEdit = true;
       const id = this.$route.params.id;
       getAnswer(id).then((response) => {
-        this.answerForm = response.data;
+        const { id, ansText, ansScore, status, createTime, updateTime, queId, subId,queScore } = response.data;
+        this.answerForm = {
+          createTime: createTime,
+          id: id,
+          queId: queId,
+          score: ansScore,
+          
+          status: status,
+          text:ansText,
+          updateTime: updateTime,
+        };
+        this.subId = subId;
+        this.queScore = queScore;
+        this.onSubjectChange();
       });
 
       // getSubjectPage({ page: 1, pageSize: 1000000 }).then((response) => {
@@ -190,6 +193,9 @@ export default {
     }
   },
   methods: {
+    clog() {
+      console.log(this.updateForm);
+    },
     onSubjectChange() {
       const id = this.subId;
       if (id) {
@@ -242,13 +248,13 @@ export default {
         this.$refs.answerForm.validate((valid) => {
           if (valid) {
             console.log(this.updateForm);
-            updateQuestion(this.updateForm)
+            updateAnswer(this.updateForm)
               .then((response) => {
                 this.$message({
                   message: "修改成功",
                   type: "success",
                 });
-                this.$router.push({ path: "/judge/question" });
+                this.$router.back();
               })
               .catch((error) => {
                 this.$message({
