@@ -15,6 +15,9 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+import 'echarts';
+import ECharts from 'vue-echarts';
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -27,6 +30,8 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
+// 全局注册组件（也可以使用局部注册）
+Vue.component("v-chart", ECharts);
 
 // set ElementUI lang to EN
 // Vue.use(ElementUI, { locale })
