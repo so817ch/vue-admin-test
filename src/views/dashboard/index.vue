@@ -3,7 +3,7 @@
     <div class="dashboard-text">
       欢迎: {{ roles[0] === "admin" ? name + roles + "!" : name }}
     </div>
-    <el-form :inline="true" class="demo-form-inline">
+    <el-form :inline="true" class="demo-form-inline" v-if="roles[0] !== 'admin'">
       <el-form-item label="我的科目">
         <el-select
           v-model="subId"
@@ -14,7 +14,7 @@
           ref="subject"
           @change="onChange"
           @clear="onClear"
-          v-if="roles[0] !== 'admin'"
+          
         >
           <el-option
             v-for="item in subjectData"
@@ -101,7 +101,8 @@ export default {
             axisTick: { show: false },
             data: this.questionData.map((item) => item.queText),
             axisLabel: {
-              rotate: 15, // 这里设置x轴标签旋转90度
+              rotate: 13, // 这里设置x轴标签旋转90度
+              fontSize:8
             },
           },
         ],

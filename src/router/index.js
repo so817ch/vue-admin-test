@@ -186,7 +186,7 @@ export const asyncRoutes = [
         path: 'index',
         name: 'test',
         component: () => import('@/views/judge/history'),
-        meta: { roles: ['editor'], title: '最近上传', icon: 'fa-solid fa-clock' }
+        meta: { roles: ['editor'], title: '答案列表', icon: 'fa-solid fa-clock' }
       },
 
       {

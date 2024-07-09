@@ -9,7 +9,7 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">Sign Up Form</h3>
+        <h3 class="title">注册</h3>
       </div>
 
       <el-form-item prop="userName" class="input">
@@ -324,6 +324,7 @@ export default {
               type: "success",
             });
             console.log(response);
+            this.handleBack();
           }).catch((error) => {
             this.$message.error('错了哦，这是一条后端返回错误消息');
             console.log(error);
